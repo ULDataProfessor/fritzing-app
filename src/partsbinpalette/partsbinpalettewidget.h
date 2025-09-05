@@ -33,6 +33,7 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "../utils/fileprogressdialog.h"
 #include "../utils/bundler.h"
 #include "binmanager/binmanager.h"
+#include "advancedpartssearch.h"
 
 class PartsBinPaletteWidget : public QFrame, public Bundler {
 	Q_OBJECT
@@ -80,6 +81,7 @@ public:
 	void focusSearch();
 	void setSaveQuietly(bool);
 	bool open(QString fileName, QWidget * progressTarget, bool fastLoad);
+	void enableAdvancedSearch(bool enable);
 
 	bool currentViewIsIconView();
 	QIcon icon();
@@ -142,6 +144,10 @@ protected:
 
 	void setFilename(const QString &filename);
 
+private slots:
+	void performAdvancedSearch();
+	void clearSearch();
+
 protected:
 	PaletteModel *m_model;
 	ReferenceModel *m_referenceModel;
@@ -163,6 +169,7 @@ protected:
 	QLabel * m_binLabel;
 
 	class SearchLineEdit * m_searchLineEdit;
+	AdvancedPartsSearch * m_advancedSearchWidget;
 
 	QToolButton * m_combinedBinMenuButton;
 

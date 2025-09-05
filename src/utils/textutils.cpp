@@ -40,12 +40,14 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include <qmath.h>
 #include <qnumeric.h>
 
+#ifndef DISABLE_SVGPP
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
 
 #include <svgpp/svgpp.hpp>
 
 #pragma GCC diagnostic pop
+#endif
 
 
 QSet<QString> InstalledFonts::InstalledFontsList;
@@ -77,7 +79,7 @@ const QString TextUtils::AdobeIllustratorIdentifier = "Generator: Adobe Illustra
 
 QList<QString> PowerPrefixes;
 QList<double> PowerPrefixValues;
-const QString TextUtils::PowerPrefixesString = QString("pnmkMGTu\\x%1").arg(MicroSymbolCode, 4, 16, QChar('0'));
+const QString TextUtils::PowerPrefixesString = QString("pnmkMGTu\\x%1").arg(static_cast<int>(MicroSymbolCode), 4, 16, QChar('0'));
 
 typedef QHash<QString /*brokenFont*/, QString /*replacementFont*/> FixedFontsHash;
 
@@ -761,7 +763,7 @@ QString TextUtils::convertExtendedChars(const QString & str)
 			result.append(c);
 		}
 		else {
-			result.append(QString("&#x%1;").arg(c.unicode(), 0, 16));
+			                        result.append(QString("&#x%1;").arg(static_cast<int>(c.unicode()), 0, 16));
 		}
 	}
 
@@ -944,6 +946,9 @@ QTransform TextUtils::elementToTransform(QDomElement & element) {
 	return transformStringToTransform(transform);
 }
 
+#ifndef DISABLE_SVGPP
+#include <boost/array.hpp>
+
 struct Context
 {
 	void transform_matrix(const boost::array<double, 6> & m)
@@ -952,8 +957,10 @@ struct Context
 	}
 	QTransform m_transform;
 };
+#endif
 
 QTransform TextUtils::transformStringToTransform(const QString & transform) {
+#ifndef DISABLE_SVGPP
 	try {
 		Context context;
 
@@ -973,6 +980,10 @@ QTransform TextUtils::transformStringToTransform(const QString & transform) {
 	} catch (...) {
 		return QTransform();
 	}
+#else
+	// SVGPP disabled - return identity transform
+	return QTransform();
+#endif
 }
 
 QList<double> TextUtils::getTransformFloats(QDomElement & element) {

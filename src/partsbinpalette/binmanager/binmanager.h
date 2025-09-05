@@ -94,6 +94,11 @@ public:
 
 	MainWindow* mainWindow();
 	void search(const QString & searchText);
+	void advancedSearch(const QString & searchText, const QString & category = QString(), 
+	                   const QString & manufacturer = QString(), const QString & family = QString(),
+	                   int minRating = 0, bool showObsolete = false, bool showContrib = true, 
+	                   bool showUser = true, bool showCore = true);
+	PartsBinPaletteWidget* getOrOpenSearchBin();
 	bool currentViewIsIconView();
 	void updateViewChecks(bool iconView);
 	QMenu * binContextMenu(PartsBinPaletteWidget *);
@@ -117,6 +122,7 @@ public Q_SLOTS:
 	void updateBinCombinedMenuCurrent();
 	void toIconView();
 	void toListView();
+	void enableAdvancedSearch();
 	void setAsCurrentBin(PartsBinPaletteWidget* bin);
 
 protected Q_SLOTS:
@@ -146,7 +152,6 @@ protected:
 	PartsBinPaletteWidget* currentBin();
 	void setAsCurrentTab(PartsBinPaletteWidget* bin);
 	PartsBinPaletteWidget* getOrOpenMyPartsBin();
-	PartsBinPaletteWidget* getOrOpenSearchBin();
 	PartsBinPaletteWidget* getOrOpenBin(const QString & dest, const QString & source);
 	void connectTabWidget();
 	void addPartToBinAux(PartsBinPaletteWidget *bin, ModelPart *modelPart, int position = -1);
@@ -193,6 +198,7 @@ protected:
 
 	QAction *m_showListViewAction;
 	QAction *m_showIconViewAction;
+	QAction *m_advancedSearchAction;
 
 	QMenu *m_partContextMenu;
 	QMenu *m_partMenu;

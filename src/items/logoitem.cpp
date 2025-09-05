@@ -483,7 +483,12 @@ void LogoItem::loadImage(const QString & fileName, bool addName)
 			convertedImage.save(imagePath);
 			DebugDialog::debug("Standardized image saved to " + imagePath, DebugDialog::Info);
 #endif
-			QString path = imageToSVGPath(convertedImage, res);
+			#ifndef DISABLE_CLIPPER
+                        QString path = imageToSVGPath(convertedImage, res);
+#else
+                        // Clipper disabled - return empty path
+                        QString path = "";
+#endif
 			QString svgDoc = TextUtils::makeSVGHeader(1, res, convertedImage.width() / res, convertedImage.height() / res)
 							 + "<g id='" + layerName() + "'>"
 							 + path

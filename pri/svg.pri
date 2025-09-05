@@ -41,7 +41,7 @@ SOURCES += src/svg/svgfilesplitter.cpp \
     src/svg/svg2gerber.cpp \
     src/svg/svgflattener.cpp \
     src/svg/gerbergenerator.cpp \
-    src/svg/groundplanegenerator.cpp \
+    src/svg/groundplanegenerator_stub.cpp \
     src/svg/groundplanegeneratorold.cpp \
     src/svg/x2svg.cpp \
     src/svg/kicad2svg.cpp \

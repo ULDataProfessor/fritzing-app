@@ -50,7 +50,7 @@ contains(LATESTBOOST, 0) {
     exists($$HOMEBREW_BOOST/boost) {
         message("using Homebrew Boost library")
         INCLUDEPATH += $$HOMEBREW_BOOST
-        LIBS += -L$$HOMEBREW_BOOST_LIB -lboost_system -lboost_filesystem
+        	LIBS += -L$$HOMEBREW_BOOST_LIB -lboost_filesystem
     } else {
         boost = 99
         qtCompileTest(boost)

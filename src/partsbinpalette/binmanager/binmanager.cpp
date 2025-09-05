@@ -959,6 +959,90 @@ void BinManager::search(const QString & searchText) {
 	setDirtyTab(searchBin);
 }
 
+void BinManager::advancedSearch(const QString & searchText, const QString & category, 
+                               const QString & manufacturer, const QString & family,
+                               int minRating, bool showObsolete, bool showContrib, 
+                               bool showUser, bool showCore) {
+	PartsBinPaletteWidget * searchBin = getOrOpenSearchBin();
+	if (searchBin == nullptr) return;
+
+	FileProgressDialog progress(tr("Advanced Search..."), 0, this);
+	progress.setIncValueMod(10);
+	connect(m_referenceModel, SIGNAL(addSearchMaximum(int)), &progress, SLOT(addMaximum(int)));
+	connect(m_referenceModel, SIGNAL(incSearch()), &progress, SLOT(incValue()));
+
+	// Get all parts first
+	QList<ModelPart *> allParts = m_referenceModel->search(searchText, showObsolete);
+	QList<ModelPart *> filteredParts;
+
+	progress.setIncValueMod(1);
+	searchBin->removeParts();
+	
+	Q_FOREACH (ModelPart * modelPart, allParts) {
+		bool includePart = true;
+		
+		// Skip schematic subparts and old schematic parts
+		if (modelPart->itemType() == ModelPart::SchematicSubpart) {
+			includePart = false;
+		}
+		else if (modelPart->moduleID().contains(PartFactory::OldSchematicPrefix)) {
+			includePart = false;
+		}
+		
+		// Apply category filter
+		if (includePart && !category.isEmpty()) {
+			QString partCategory = modelPart->properties().value("category", "").toLower();
+			if (!partCategory.contains(category.toLower())) {
+				includePart = false;
+			}
+		}
+		
+		// Apply manufacturer filter
+		if (includePart && !manufacturer.isEmpty()) {
+			QString partManufacturer = modelPart->properties().value("manufacturer", "").toLower();
+			if (!partManufacturer.contains(manufacturer.toLower())) {
+				includePart = false;
+			}
+		}
+		
+		// Apply family filter
+		if (includePart && !family.isEmpty()) {
+			QString partFamily = modelPart->properties().value("family", "").toLower();
+			if (!partFamily.contains(family.toLower())) {
+				includePart = false;
+			}
+		}
+		
+		// Apply rating filter (if rating property exists)
+		if (includePart && minRating > 0) {
+			bool ok;
+			int partRating = modelPart->properties().value("rating", "0").toInt(&ok);
+			if (!ok || partRating < minRating) {
+				includePart = false;
+			}
+		}
+		
+		// Apply source filters
+		if (includePart) {
+			QString partPath = modelPart->path();
+			bool isCore = partPath.contains("core") || partPath.contains(":/resources/parts");
+			bool isContrib = partPath.contains("contrib");
+			bool isUser = partPath.contains("user") || partPath.contains(FolderUtils::getUserPartsPath());
+			
+			if (isCore && !showCore) includePart = false;
+			if (isContrib && !showContrib) includePart = false;
+			if (isUser && !showUser) includePart = false;
+		}
+		
+		if (includePart) {
+			this->addPartTo(searchBin, modelPart, false);
+		}
+		progress.incValue();
+	}
+
+	setDirtyTab(searchBin);
+}
+
 bool BinManager::currentViewIsIconView() {
 	PartsBinPaletteWidget * bin = currentBin();
 	if (bin == nullptr) return true;
@@ -978,6 +1062,14 @@ void BinManager::toListView() {
 	if (bin == nullptr) return;
 
 	bin->toListView();
+}
+
+void BinManager::enableAdvancedSearch() {
+	PartsBinPaletteWidget * searchBin = getOrOpenSearchBin();
+	if (searchBin == nullptr) return;
+	
+	searchBin->enableAdvancedSearch(true);
+	setAsCurrentTab(searchBin);
 }
 
 void BinManager::updateBinCombinedMenuCurrent() {
@@ -1061,6 +1153,10 @@ void BinManager::createCombinedMenu()
 	m_showIconViewAction->setStatusTip(tr("Display parts as icons"));
 	connect(m_showIconViewAction, SIGNAL(triggered()),this, SLOT(toIconView()));
 
+	m_advancedSearchAction = new QAction(tr("Advanced Search..."), this);
+	m_advancedSearchAction->setStatusTip(tr("Open advanced parts search with filters"));
+	connect(m_advancedSearchAction, SIGNAL(triggered()),this, SLOT(enableAdvancedSearch()));
+
 	m_combinedMenu->addAction(m_openAction);
 	m_combinedMenu->addSeparator();
 
@@ -1078,6 +1174,8 @@ void BinManager::createCombinedMenu()
 	m_combinedMenu->addSeparator();
 	m_combinedMenu->addAction(m_showIconViewAction);
 	m_combinedMenu->addAction(m_showListViewAction);
+	m_combinedMenu->addSeparator();
+	m_combinedMenu->addAction(m_advancedSearchAction);
 
 	m_editPartNewAction = new QAction(tr("Edit Part (new parts editor)..."),this);
 	m_exportPartAction = new QAction(tr("Export Part..."),this);

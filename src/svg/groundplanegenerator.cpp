@@ -45,13 +45,14 @@ using boost::math::epsilon_difference;
 #include <limits>
 #include <QtConcurrentRun>
 
+#ifndef DISABLE_CLIPPER
 using namespace ClipperLib;
 
+static QList<Paths> convertCopperPolygonsToGroundPlane(Paths nonCopper, Paths thermalReliefPads, double pixelFactor, double keepoutMils, QPointF *seedPoint);
+#endif
 
 const QString GroundPlaneGenerator::KeepoutSettingName("GPG_Keepout");
 const double GroundPlaneGenerator::KeepoutDefaultMils = 10;
-
-static QList<Paths> convertCopperPolygonsToGroundPlane(Paths nonCopper, Paths thermalReliefPads, double pixelFactor, double keepoutMils, QPointF *seedPoint);
 
 class GroundPlanePaintDevice;
 

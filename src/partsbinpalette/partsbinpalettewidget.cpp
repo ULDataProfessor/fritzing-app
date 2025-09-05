@@ -62,6 +62,7 @@ PartsBinPaletteWidget::PartsBinPaletteWidget(ReferenceModel *referenceModel, Htm
 	m_binLabel = nullptr;
 	m_monoIcon = m_icon = nullptr;
 	m_searchLineEdit = nullptr;
+	m_advancedSearchWidget = nullptr;
 	m_saveQuietly = false;
 	m_fastLoaded = false;
 	m_model = nullptr;
@@ -190,11 +191,17 @@ void PartsBinPaletteWidget::setupHeader()
 	m_searchLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	connect(m_searchLineEdit, &SearchLineEdit::updateSearch, this, &PartsBinPaletteWidget::search);
 
+	// Create advanced search widget
+	m_advancedSearchWidget = new AdvancedPartsSearch(this);
+	connect(m_advancedSearchWidget, &AdvancedPartsSearch::searchRequested, this, &PartsBinPaletteWidget::performAdvancedSearch);
+	connect(m_advancedSearchWidget, &AdvancedPartsSearch::clearRequested, this, &PartsBinPaletteWidget::clearSearch);
+
 	m_searchStackedWidget = new QStackedWidget(this);
 	m_searchStackedWidget->setObjectName("searchStackedWidget");
 
 	m_searchStackedWidget->addWidget(m_binLabel);
 	m_searchStackedWidget->addWidget(m_searchLineEdit);
+	m_searchStackedWidget->addWidget(m_advancedSearchWidget);
 
 	m_header = new QFrame(this);
 	m_header->setObjectName("partsBinHeader");
@@ -788,6 +795,39 @@ void PartsBinPaletteWidget::search(const QString& searchText) {
 	m_manager->search(searchText);
 }
 
+void PartsBinPaletteWidget::performAdvancedSearch() {
+	if (m_advancedSearchWidget == nullptr) return;
+
+	QString searchText = m_advancedSearchWidget->getSearchText();
+	QString category = m_advancedSearchWidget->getCategory();
+	QString manufacturer = m_advancedSearchWidget->getManufacturer();
+	QString family = m_advancedSearchWidget->getFamily();
+	int minRating = m_advancedSearchWidget->getMinRating();
+	bool showObsolete = m_advancedSearchWidget->getShowObsolete();
+	bool showContrib = m_advancedSearchWidget->getShowContrib();
+	bool showUser = m_advancedSearchWidget->getShowUser();
+	bool showCore = m_advancedSearchWidget->getShowCore();
+
+	ModelPartSharedRoot * root = m_model->rootModelPartShared();
+	if (root != nullptr) {
+		root->setSearchTerm(searchText);
+	}
+
+	m_manager->advancedSearch(searchText, category, manufacturer, family, 
+	                        minRating, showObsolete, showContrib, showUser, showCore);
+}
+
+void PartsBinPaletteWidget::clearSearch() {
+	if (m_advancedSearchWidget != nullptr) {
+		m_advancedSearchWidget->clearFilters();
+	}
+	// Clear the search bin
+	PartsBinPaletteWidget * searchBin = m_manager->getOrOpenSearchBin();
+	if (searchBin != nullptr) {
+		searchBin->removeParts();
+	}
+}
+
 bool PartsBinPaletteWidget::allowsChanges() {
 	return m_allowsChanges;
 }
@@ -812,6 +852,25 @@ void PartsBinPaletteWidget::focusSearch() {
 
 void PartsBinPaletteWidget::focusSearchAfter() {
 	m_searchLineEdit->setFocus(Qt::OtherFocusReason);
+}
+
+void PartsBinPaletteWidget::enableAdvancedSearch(bool enable) {
+	if (m_searchStackedWidget == nullptr) return;
+	
+	if (enable) {
+		// Switch to advanced search widget
+		m_searchStackedWidget->setCurrentIndex(2);
+		if (m_advancedSearchWidget != nullptr) {
+			m_advancedSearchWidget->focusSearch();
+		}
+	} else {
+		// Switch back to basic search
+		if (m_fileName.compare(BinManager::SearchBinLocation) == 0) {
+			m_searchStackedWidget->setCurrentIndex(1); // Basic search
+		} else {
+			m_searchStackedWidget->setCurrentIndex(0); // Bin label
+		}
+	}
 }
 
 void PartsBinPaletteWidget::setSaveQuietly(bool saveQuietly) {
