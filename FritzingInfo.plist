@@ -27,11 +27,11 @@ You should have received a copy of the GNU General Public License
         <key>CFBundleExecutable</key>
         <string>Fritzing</string>
         <key>CFBundleGetInfoString</key>
-		<string>Fritzing 1.0.5</string>
+		<string>Fritzing 1.0.4b</string>
         <key>CFBundleShortVersionString</key>
-		<string>1.0.5</string>
+		<string>1.0.4b</string>
         <key>CFBundleVersion</key>
-		<string>104347</string>
+		<string>104040</string>
         <key>CFBundleIconFile</key>
         <string>fritzing_icon.icns</string>
         <key>CFBundleIdentifier</key>

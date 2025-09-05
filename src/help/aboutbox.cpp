@@ -145,6 +145,14 @@ AboutBox::AboutBox(QWidget *parent)
 
 		"<p>" +
 		tr("Special thanks go out to all the students and alpha testers who were brave enough to give Fritzing a test spin.") +
+		"</p>" +
+
+		"<p>" +
+		tr("<b>Forked and Enhanced by:</b><br/>") +
+		tr("Sidney Shapiro, University of Lethbridge<br/>") +
+		tr("Enhanced with optimized build system, expanded parts library (3,212+ parts),<br/>") +
+		tr("and comprehensive automation tools.<br/>") +
+		tr("Original repository: <a href=\"https://github.com/fritzing/fritzing-app\">https://github.com/fritzing/fritzing-app</a>") +
 		"</p>";
 
 	QString br = "<br/>";

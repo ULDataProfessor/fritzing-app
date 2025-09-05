@@ -1566,7 +1566,7 @@ void FApplication::initSplash(FSplashScreen & splash) {
 	// put this above the progress indicator
 
 	QString msg1 = QString("<font face='Lucida Grande, Tahoma, Sans Serif' size='2' color='#eaf4ed'>"
-	                           "&#169; 2007-%1 Fritzing"
+	                           "&#169; 2007-%1 Fritzing<br/>Forked by Sidney Shapiro, University of Lethbridge"
 	                           "</font>")
 	               .arg(Version::year());
 	splash.showMessage(msg1, "fritzingText", Qt::AlignLeft | Qt::AlignTop);
