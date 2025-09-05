@@ -24,7 +24,9 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #include "../processeventblocker.h"
 #include "clipperhelpers.h"
 
+#ifndef DISABLE_CLIPPER
 #include <clipper.hpp>
+#endif
 
 #include <QBitArray>
 #include <QFile>

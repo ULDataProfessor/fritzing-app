@@ -21,7 +21,9 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef GROUNDPLANEGENERATOR_H
 #define GROUNDPLANEGENERATOR_H
 
+#ifndef DISABLE_CLIPPER
 #include <clipper.hpp>
+#endif
 #include <QImage>
 #include <QList>
 #include <QRect>
@@ -75,7 +77,11 @@ public:
 
 protected:
 	bool generateGroundPlaneFn(const GPGParams &);
+#ifndef DISABLE_CLIPPER
 	void makeCopperFillFromPolygons(QList<ClipperLib::Paths> &sortedPolygons, double res, const QString &colorString, bool makeConnectorFlag, QSizeF minAreaInches, double minDimensionInches);
+#else
+	void makeCopperFillFromPolygons(QList<void*> &sortedPolygons, double res, const QString &colorString, bool makeConnectorFlag, QSizeF minAreaInches, double minDimensionInches);
+#endif
 
 protected:
 	QStringList m_newSVGs;
@@ -90,7 +96,11 @@ public:
 	static const QString KeepoutSettingName;
 	static const double KeepoutDefaultMils;
 
+#ifndef DISABLE_CLIPPER
 	void createGroundThermalPads(GPGParams &params, double clipperDPI, std::vector<ClipperLib::Path> &groundConnectorsZone, std::vector<ClipperLib::Path> &groundThermalConnectors);
+#else
+	void createGroundThermalPads(GPGParams &params, double clipperDPI, std::vector<void*> &groundConnectorsZone, std::vector<void*> &groundThermalConnectors);
+#endif
 };
 
 #endif

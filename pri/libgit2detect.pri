@@ -60,29 +60,43 @@ win32 {
 }
 
 unix {
-	LIBGIT2LIB = $$LIBGITPATH/lib
-	if ($$LIBGIT_STATIC) {
-
-		exists($$LIBGIT2LIB/libgit2.a) {
-			message("found libgit2 library in $$LIBGIT2LIB")
-		} else {
-			error("static libgit2 library not found in $$LIBGIT2LIB")
-		}
-		INCLUDEPATH += $$LIBGITPATH/include
+	# Try Homebrew-installed libgit2 first
+	HOMEBREW_LIBGIT2 = /opt/homebrew/lib
+	HOMEBREW_LIBGIT2_INCLUDE = /opt/homebrew/include
+	
+	exists($$HOMEBREW_LIBGIT2/libgit2.dylib) {
+		message("found Homebrew libgit2 library in $$HOMEBREW_LIBGIT2")
+		INCLUDEPATH += $$HOMEBREW_LIBGIT2_INCLUDE
+		LIBS += -L$$HOMEBREW_LIBGIT2 -lgit2
 		macx {
-			LIBS += $$LIBGIT2LIB/libgit2.a -framework Security
-		} else {
-			LIBS += $$LIBGIT2LIB/libgit2.a -lssl -lcrypto
+			LIBS += -framework Security
 		}
 	} else {
-		message("Enabled dynamic linking of libgit2 $$LIBGIT_VERSION")
-		INCLUDEPATH += $$LIBGITPATH/include
-		LIBS += -L$$LIBGIT2LIB -lgit2
-		!macx {
-			QMAKE_RPATHDIR += $$LIBGIT2LIB
+		# Fallback to local build
+		LIBGIT2LIB = $$LIBGITPATH/lib
+		if ($$LIBGIT_STATIC) {
+
+			exists($$LIBGIT2LIB/libgit2.a) {
+				message("found libgit2 library in $$LIBGIT2LIB")
+			} else {
+				error("static libgit2 library not found in $$LIBGIT2LIB")
+			}
+			INCLUDEPATH += $$LIBGITPATH/include
+			macx {
+				LIBS += $$LIBGIT2LIB/libgit2.a -framework Security
+			} else {
+				LIBS += $$LIBGIT2LIB/libgit2.a -lssl -lcrypto
+			}
+		} else {
+			message("Enabled dynamic linking of libgit2 $$LIBGIT_VERSION")
+			INCLUDEPATH += $$LIBGITPATH/include
+			LIBS += -L$$LIBGIT2LIB -lgit2
+			!macx {
+				QMAKE_RPATHDIR += $$LIBGIT2LIB
+			}
+			#PKG_CONFIG_PATH=$$LIBGITPATH/lib/pkgconfig:$$PKG_CONFIG_PATH
+			#PKGCONFIG += libgit2
 		}
-		#PKG_CONFIG_PATH=$$LIBGITPATH/lib/pkgconfig:$$PKG_CONFIG_PATH
-		#PKGCONFIG += libgit2
 	}
 }
 

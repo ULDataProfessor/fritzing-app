@@ -25,10 +25,13 @@ along with Fritzing.  If not, see <http://www.gnu.org/licenses/>.
 #define CLIPPERHELPERS_H
 
 
+#ifndef DISABLE_CLIPPER
 #include <clipper.hpp>
+#endif
 #include <QPaintEngine>
 #include <fstream>
 
+#ifndef DISABLE_CLIPPER
 inline ClipperLib::JoinType qtToClipperJoinType(Qt::PenJoinStyle style) {
 	switch (style) {
 		case Qt::MiterJoin:
@@ -43,7 +46,9 @@ inline ClipperLib::JoinType qtToClipperJoinType(Qt::PenJoinStyle style) {
 			return ClipperLib::jtRound;
 	}
 }
+#endif
 
+#ifndef DISABLE_CLIPPER
 inline ClipperLib::EndType qtToClipperEndType(Qt::PenCapStyle style, bool open, bool fill) {
 	if (open)
 		switch (style) {
@@ -175,5 +180,6 @@ inline QString imageToSVGPath(QImage &image, double res) {
 	cp.Execute(ClipperLib::ctUnion, result, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 	return clipperPathsToSVG(result, res, false);
 }
+#endif
 
 #endif // CLIPPERHELPERS_H

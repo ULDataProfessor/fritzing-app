@@ -43,13 +43,23 @@ defined(boost_root, var) {
 
 # do the common configuration after all detection is finished
 contains(LATESTBOOST, 0) {
-    boost = 99
-    qtCompileTest(boost)
-    config_boost {
-        !build_pass:message("using installed Boost library")
+    # Try Homebrew-installed Boost first
+    HOMEBREW_BOOST = /opt/homebrew/include
+    HOMEBREW_BOOST_LIB = /opt/homebrew/lib
+    
+    exists($$HOMEBREW_BOOST/boost) {
+        message("using Homebrew Boost library")
+        INCLUDEPATH += $$HOMEBREW_BOOST
+        LIBS += -L$$HOMEBREW_BOOST_LIB -lboost_system -lboost_filesystem
     } else {
-        message("Boost 1.54 has a bug in a function that Fritzing uses, so download or install some other version")
-        error("Easiest to copy the Boost library to ..., so that you have .../boost_1_xx_0")
+        boost = 99
+        qtCompileTest(boost)
+        config_boost {
+            !build_pass:message("using installed Boost library")
+        } else {
+            message("Boost 1.54 has a bug in a function that Fritzing uses, so download or install some other version")
+            error("Easiest to copy the Boost library to ..., so that you have .../boost_1_xx_0")
+        }
     }
 } else {
     defined(BOOSTPATH, var) {

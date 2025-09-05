@@ -411,16 +411,15 @@ WelcomeView::WelcomeView(QWidget * parent) : QFrame(parent)
 	connect(this, SIGNAL(openSketch()), this->window(), SLOT(mainLoad()));
 	connect(this, SIGNAL(recentSketch(const QString &, const QString &)), this->window(), SLOT(openRecentOrExampleFile(const QString &, const QString &)));
 
-	QString protocol = QSslSocket::supportsSsl() ? "https" : "http";
-	// TODO: blog network calls should only happen once, not for each window?
-	auto * manager = new QNetworkAccessManager(this);
-	connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(gotBlogSnippet(QNetworkReply *)));
-	manager->get(QNetworkRequest(QUrl(QString("%1://blog.fritzing.org/recent-posts-app/").arg(protocol))));
-
-	manager = new QNetworkAccessManager(this);
-
-	connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(gotBlogSnippet(QNetworkReply *)));
-	manager->get(QNetworkRequest(QUrl(QString("%1://fritzing.org/projects/snippet/").arg(protocol))));
+	// Blog network calls removed - not needed in this fork
+	// QString protocol = QSslSocket::supportsSsl() ? "https" : "http";
+	// auto * manager = new QNetworkAccessManager(this);
+	// connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(gotBlogSnippet(QNetworkReply *)));
+	// manager->get(QNetworkRequest(QUrl(QString("%1://blog.fritzing.org/recent-posts-app/").arg(protocol))));
+	// 
+	// manager = new QNetworkAccessManager(this);
+	// connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(gotBlogSnippet(QNetworkReply *)));
+	// manager->get(QNetworkRequest(QUrl(QString("%1://fritzing.org/projects/snippet/").arg(protocol))));
 
 	TipsAndTricks::initTipSets();
 	nextTip();
@@ -437,13 +436,15 @@ void WelcomeView::initLayout()
 	QWidget * recent = initRecent();
 	mainLayout->addWidget(recent, 0, 0);
 
-	QWidget * widget = initBlog();
-	mainLayout->addWidget(widget, 0, 1);
+	// Blog widget removed - not needed in this fork
+	// QWidget * widget = initBlog();
+	// mainLayout->addWidget(widget, 0, 1);
 
-	widget = initShop();
-	mainLayout->addWidget(widget, 1, 1);
+	// Fritzing Fab advertisement removed - not needed in this fork
+	// QWidget * widget = initShop();
+	// mainLayout->addWidget(widget, 1, 1);
 
-	widget = initTip();
+	QWidget * widget = initTip();
 	mainLayout->addWidget(widget, 1, 0);
 
 

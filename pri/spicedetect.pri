@@ -15,12 +15,25 @@
 
 
 message("Using fritzing ngspice detect script.")
-NGSPICEPATH = ../../ngspice-42
-NGSPICEPATH = $$absolute_path($${NGSPICEPATH})
 
-exists($$NGSPICEPATH) {
-	message("found $${NGSPICEPATH}")
-	INCLUDEPATH += $$NGSPICEPATH/include
+# Try Homebrew-installed ngspice first
+HOMEBREW_NGSPICE = /opt/homebrew/include
+HOMEBREW_NGSPICE_LIB = /opt/homebrew/lib
+
+exists($$HOMEBREW_NGSPICE/ngspice) {
+	message("found Homebrew ngspice in $$HOMEBREW_NGSPICE")
+	INCLUDEPATH += $$HOMEBREW_NGSPICE
+	LIBS += -L$$HOMEBREW_NGSPICE_LIB -lngspice
 } else {
-    error("ngspice not found in $${NGSPICEPATH}")
+	# Fallback to local build
+	NGSPICEPATH = ../../ngspice-42
+	NGSPICEPATH = $$absolute_path($${NGSPICEPATH})
+
+	exists($$NGSPICEPATH) {
+		message("found $${NGSPICEPATH}")
+		INCLUDEPATH += $$NGSPICEPATH/include
+	} else {
+		message("ngspice not found, disabling simulation features")
+		DEFINES += DISABLE_NGSPICE
+	}
 }
